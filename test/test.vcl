@@ -1,9 +1,5 @@
 vcl 4.1;
 
-# CI fixture, a representative rendering of the consumer's default.vcl. Asserts the
-# image compiles VCL (blobdigest loads, and the baked otel.inc.vcl include via
-# vcl_path=/etc/varnish is accepted despite repeating `vcl 4.1;`/`import std`).
-
 import directors;
 include "otel.inc.vcl";
 
