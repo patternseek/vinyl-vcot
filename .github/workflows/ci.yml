@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build image
+        run: docker build -t vinyl-vcot:test .
+
+      - name: vmods present (blobdigest + bundled)
+        run: |
+          docker run --rm vinyl-vcot:test ls /usr/lib/varnish/vmods/ \
+            | grep -E 'libvmod_(blobdigest|blob|directors|std)\.so'
+
+      - name: vcot binary runs
+        run: docker run --rm vinyl-vcot:test vcot -h 2>&1 | grep -q Usage
+
+      - name: VCL compiles (incl. baked otel.inc.vcl + blobdigest load)
+        run: |
+          docker run --rm -v "$PWD/test":/vcltest:ro vinyl-vcot:test \
+            varnishd -C -p vcl_path=/etc/varnish -f /vcltest/test.vcl >/dev/null
