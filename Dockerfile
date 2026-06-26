@@ -33,10 +33,16 @@ RUN git clone https://gitlab.com/uplex/varnish/libvmod-blobdigest.git \
 
 # vcot daemon, built against the same engine API. VSM_NOPID lets it attach to the
 # VSM across container boundaries without the pid match.
+# + Patch: vcot only maps the Start/Resp/BerespBody Timestamp events and returns an
+# error (logged per-record) for every other one (Req, Process, Fetch, Bereq, ...),
+# which floods the log under traffic. We make those unhandled labels a no-op. The
+# grep guard fails the build if the line moves on a VCOT_REF bump (re-check then).
 ENV VSM_NOPID=1
 RUN git clone https://gitlab.com/uplex/varnish/VinylCacheOpenTelemetry.git vcot \
     && cd vcot \
     && git checkout "${VCOT_REF}" \
+    && grep -q 'Failed to parse Timestamp payload' internal/vsl/vsl.go \
+    && sed -i 's#return errors.New("Failed to parse Timestamp payload")#return nil#' internal/vsl/vsl.go \
     && CGO_ENABLED=1 GOOS=linux go build -o /out/usr/local/bin/vcot ./cmd/vcot.go
 
 # the cache engine from the package + our two artifacts
