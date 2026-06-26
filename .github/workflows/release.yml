@@ -6,10 +6,6 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+'
 
 env:
-  # Published to GHCR as ghcr.io/<owner>/vinyl-vcot. Auth uses the built-in
-  # GITHUB_TOKEN (no Docker Hub secrets). The package starts private; set its
-  # visibility to Public once in the package settings. Consumers reference it via
-  # their own inventory.
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/vinyl-vcot
 
 jobs:
