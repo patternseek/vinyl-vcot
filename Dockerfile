@@ -11,6 +11,6 @@
 ARG ALPINE_TAG=edge
 
 FROM alpine:${ALPINE_TAG}
-ARG VARNISH_VERSION=~9.0
+ARG VARNISH_VERSION=~9.0.0
 # tzdata for local-time log timestamps; varnish is the cache engine.
 RUN apk add --no-cache tzdata "varnish${VARNISH_VERSION:+=$VARNISH_VERSION}"
