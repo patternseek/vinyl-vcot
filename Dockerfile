@@ -3,14 +3,16 @@
 #   ALPINE_TAG      Alpine branch the engine apk comes from. edge ships varnish 9.0.x;
 #                   stable 3.22 ships 7.7.x. edge drifts -- pin to a stable once one
 #                   ships 9.x.
-#   VARNISH_VERSION optional apk version pin for the engine. The package is still named
-#                   `varnish` (it is the Vinyl project, not yet renamed after the split).
-#                   Empty = whatever ALPINE_TAG currently ships. Set an apk constraint to
-#                   pin, e.g. `9.0.0-r0` (exact) or `~9.0` (latest 9.0.x). The version
-#                   must exist in ALPINE_TAG's repo (edge only carries the current one).
+#   VARNISH_VERSION apk version pin for the engine (package still named `varnish` -- it
+#                   is the Vinyl project, pre-rename). Pinned exact so engine changes are
+#                   deliberate: an edge varnish bump then fails the build until this is
+#                   updated on purpose. Exact apk pins need the `-rN` revision
+#                   (`9.0.3-r0`, not `9.0.3`); `~9.0` floats the 9.0.x minor instead.
+#                   NOTE: edge currently carries only 9.0.3-r0 -- bump deliberately when
+#                   edge moves, or when pinning ALPINE_TAG to a stable that ships 9.x.
 ARG ALPINE_TAG=edge
 
 FROM alpine:${ALPINE_TAG}
-ARG VARNISH_VERSION=~9.0.0
+ARG VARNISH_VERSION=9.0.3-r0
 # tzdata for local-time log timestamps; varnish is the cache engine.
 RUN apk add --no-cache tzdata "varnish${VARNISH_VERSION:+=$VARNISH_VERSION}"
